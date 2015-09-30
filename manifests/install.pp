@@ -21,6 +21,11 @@ class kibana::install {
       ensure            => absent,
     }
   }
+  file { "${kibana::install_dir}" :
+    ensure              => $kibana::installed ? {
+      false   => absent,
+      default => directory },
+  } ->
   file { "${kibana::install_dir}/kibana" :
     ensure              => $kibana::installed ? {
       false   => absent,
