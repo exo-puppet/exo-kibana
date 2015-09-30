@@ -9,7 +9,7 @@ class kibana::install {
       require           => File["${kibana::download_dir}"],
     } ->
     # Untar the archive
-    exec { "untar-kibana-${kibana::version}" :
+    exec { "install-kibana-${kibana::version}" :
       command           => "/bin/tar xf ${kibana::download_dir}/${kibana::params::download_file} --directory ${kibana::install_dir}",
       unless            => "test -d ${kibana::install_dir}/${kibana::params::file}",
     }
