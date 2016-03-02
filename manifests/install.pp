@@ -12,6 +12,12 @@ class kibana::install {
     exec { "install-kibana-${kibana::version}" :
       command           => "/bin/tar xf ${kibana::download_dir}/${kibana::params::download_file} --directory ${kibana::install_dir}",
       unless            => "test -d ${kibana::install_dir}/${kibana::params::file}",
+    } ->
+    file { "${kibana::install_dir}/${kibana::params::file}" :
+      ensure            => directory,
+      recurse           => true,
+      owner             => "${kibana::user}",
+      group             => "${kibana::group}",
     }
   } else {
     file { "${kibana::download_dir}/${kibana::params::download_file}" :
@@ -24,7 +30,8 @@ class kibana::install {
   file { "${kibana::install_dir}" :
     ensure              => $kibana::installed ? {
       false   => absent,
-      default => directory },
+      default => directory,
+    },
   } ->
   file { "${kibana::install_dir}/kibana" :
     ensure              => $kibana::installed ? {
@@ -32,11 +39,13 @@ class kibana::install {
       default => link },
     target            => "${kibana::install_dir}/${kibana::params::file}",
   }
+
   # Logs directory
   file { "/var/log/kibana" :
     ensure            => $kibana::installed ? {
       false   => absent,
       default => directory },
+    recurse           => true,
     owner             => "${kibana::user}",
     group             => "${kibana::group}",
   }
@@ -48,5 +57,4 @@ class kibana::install {
     content           => template('kibana/kibana.init.erb'),
     mode              => 744,
   }
-
 }
